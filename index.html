@@ -1,0 +1,252 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Kroswed</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#F8FAFC;--fg:#17233B;--card:#fff;--bd:#E8EDF2;--mut:#64748B;--pri:#4778B8;--ok:#32936F;--warn:#D39A42;--err:#D45D5D;--gold:#D6A84B;--blk:#17233B;--act:#AFC5E0;--sel:#4778B8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101827;--fg:#E8EDF2;--card:#17233B;--bd:#2a3856;--mut:#94A3B8;--blk:#05090f;--act:#2c4468}}
+:root[data-theme="dark"]{--bg:#101827;--fg:#E8EDF2;--card:#17233B;--bd:#2a3856;--mut:#94A3B8;--blk:#05090f;--act:#2c4468}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--fg);font:15px/1.5 Inter,system-ui,sans-serif}
+.w{max-width:980px;margin:0 auto;padding:16px}header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+h1{margin:0;font:700 24px Georgia,serif;letter-spacing:.14em}.tag{color:var(--mut);font-size:13px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-top:14px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:8px;padding:8px 12px}
+button:hover{border-color:var(--pri)}button.p{background:var(--pri);color:#fff;border-color:var(--pri)}button.on{outline:2px solid var(--pri)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pri);transition:width .6s}
+.opt{flex:1;min-width:120px;text-align:left}.opt small{display:block;color:var(--mut)}
+#game{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}@media(max-width:760px){#game{grid-template-columns:1fr}}
+.gw{overflow:auto;max-width:100%}.g{display:grid;gap:2px;margin:auto}
+.c{aspect-ratio:1;position:relative;background:var(--card);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font:600 clamp(14px,3.4vw,22px) Inter,sans-serif;text-transform:uppercase;cursor:pointer;user-select:none}
+.c.b{background:transparent;border-color:transparent;cursor:default}.c.a{background:var(--act)}.c.s{background:var(--sel);color:#fff}.c.x{color:var(--err)}.c.r{color:var(--warn)}.c.d{color:var(--ok)}
+.c sup{position:absolute;top:1px;left:2px;font-size:9px;font-weight:500;color:var(--mut)}.c.s sup{color:#fff}
+.cl{max-height:430px;overflow:auto}.cl h3{margin:8px 0 4px;font-size:13px;letter-spacing:.08em;color:var(--mut)}.cl div{padding:4px 6px;border-radius:6px;cursor:pointer;font-size:14px}.cl div.a{background:var(--act)}
+#cur{font-weight:600;min-height:44px}.mod{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:16px}.mod .card{max-width:380px;width:100%}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--bd);color:var(--mut);font-size:12px;text-align:center}footer a{color:var(--pri)}
+#hid{position:fixed;opacity:0;left:-100px;top:0}
+input,textarea{font:inherit;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:8px}</style><script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script></head><body><div class="w">
+<header><div><h1>KROSWED</h1><div class="tag">Challenge Your Mind. Expand Your Knowledge.</div></div>
+<div class="row"><button data-v="home">Play</button><button data-v="lb">Leaderboard</button><button data-v="pf">Profile</button><button id="th" aria-label="Theme"></button><button id="ab">About</button></div></header>
+<div id="app"></div>
+<footer><b>KROSWED</b> · English Crossword &amp; Knowledge Game<br>Created and Developed by Muhammad Ilham Ramadhan · <a href="https://www.instagram.com/iaamramadhan/" target="_blank" rel="noopener">@iaamramadhan</a><br>Designed and developed by Muhammad Ilham Ramadhan with assistance from AI development tools.<br>© 2026 Muhammad Ilham Ramadhan. All rights reserved.</footer></div>
+<input id="hid" autocomplete="off" autocapitalize="characters" aria-label="Letter input">
+<script>
+const RAW={gk:`ATOM|Smallest unit of a chemical element|Basic building block of matter|1
+OXYGEN|Gas we breathe to live|Element with symbol O|1
+GRAVITY|Force that pulls objects toward Earth|Force linked to Newton’s falling apple|1
+PLANET|Body orbiting a star|Mars or Venus, for example|1
+VOLCANO|Mountain that erupts lava|Vent that spews magma and ash|1
+SKELETON|All the bones of the body|Framework of 206 bones in an adult|1
+HEART|Organ that pumps blood|Muscular organ in the chest|1
+PIANO|Instrument with 88 keys|Keyboard instrument with hammers and strings|1
+DOLPHIN|Intelligent marine mammal|Mammal that uses echolocation|1
+ENERGY|Capacity to do work|Quantity measured in joules|1
+MAGNET|Object that attracts iron|Has north and south poles|1
+NEURON|Nerve cell|Cell that transmits electrical signals|2
+GALAXY|Vast system of stars, like the Milky Way|Home to billions of stars|2
+ENZYME|Protein that speeds up reactions|Biological catalyst|2
+MITOSIS|Cell division producing identical cells|Process of body-cell division|2
+NEWTON|Unit of force|Physicist behind the laws of motion|2
+HELIUM|Second-lightest element|Noble gas used in balloons|2
+SONNET|Fourteen-line poem|Form Shakespeare used for 154 poems|2
+HAMLET|Shakespeare’s Danish prince|Tragedy set at Elsinore|2
+CARBON|Element with atomic number 6|Basis of organic chemistry|2
+PENICILLIN|Antibiotic discovered by Fleming|Mold-derived drug found in 1928|3
+TELESCOPE|Instrument for viewing distant stars|Galileo used one to see Jupiter’s moons|2
+DEMOCRACY|Government by the people|System of rule by elected representatives|2
+INFLATION|General rise in prices|Erosion of money’s purchasing power|2
+ENTROPY|Thermodynamic measure of disorder|Quantity that tends to rise in isolated systems|3
+PHOTON|Quantum of light|Massless particle of electromagnetic radiation|3
+ISOTOPE|Atom variant with a different neutron count|Carbon-14 is one|3
+CATALYST|Speeds a reaction without being consumed|Enzymes act as this|3
+RENAISSANCE|Cultural rebirth that began in Italy|Era of Leonardo and Michelangelo|3
+PARADIGM|Model or pattern of thinking|Kuhn’s term for a scientific framework|3
+SYNAPSE|Junction between two neurons|Gap crossed by neurotransmitters|3
+QUASAR|Extremely luminous galactic core|Bright object powered by a black hole|3
+HEMOGLOBIN|Oxygen-carrying protein in blood|Makes red blood cells red|3
+ALGORITHM|Step-by-step procedure for solving a problem|Word derived from al-Khwarizmi|3`,
+geo:`PARIS|Capital of France|City of the Eiffel Tower|1
+TOKYO|Capital of Japan|Japan’s largest city|1
+EGYPT|Country of the pyramids|Nation on the Nile in northeast Africa|1
+ASIA|Largest continent|Continent containing China and India|1
+NILE|River flowing through Egypt|Famous river of northeast Africa|1
+PACIFIC|Largest ocean|Ocean bordering Japan and California|1
+SAHARA|Largest hot desert|Desert spanning North Africa|1
+EVEREST|Highest mountain above sea level|Peak on the Nepal–Tibet border|1
+CANADA|Country with capital Ottawa|Nation north of the USA|1
+BRAZIL|Largest country in South America|Country where Brasília is the capital|1
+ITALY|Country shaped like a boot|Home of Rome and Venice|1
+AFRICA|Continent with 54 countries|Continent containing Kenya and Nigeria|1
+LONDON|Capital of the United Kingdom|City on the River Thames|1
+CAIRO|Capital of Egypt|City near the Giza pyramids|1
+AMAZON|South American river with the largest discharge|Rainforest river of Brazil and Peru|2
+DANUBE|River flowing through Vienna and Budapest|Second-longest river in Europe|2
+CANBERRA|Capital of Australia|Planned city chosen over Sydney and Melbourne|2
+ICELAND|Island nation of geysers and volcanoes|Country with capital Reykjavik|2
+ANDES|Longest continental mountain range|South American mountain chain|2
+BALTIC|Sea bordered by Sweden and Estonia|Sea north of Poland|2
+MADAGASCAR|Large island off Africa’s east coast|Home of lemurs|2
+JAKARTA|Capital of Indonesia|Megacity on Java’s northwest coast|2
+NAIROBI|Capital of Kenya|East African capital|2
+BAIKAL|Deepest lake in the world|Siberian lake|2
+ARCTIC|Ocean around the North Pole|Smallest of the world’s oceans|2
+GREENLAND|World’s largest island|Autonomous territory of Denmark|2
+KILIMANJARO|Highest mountain in Africa|Tanzanian volcano|3
+REYKJAVIK|Northernmost capital of a sovereign state|Capital of Iceland|3
+TITICACA|Lake on the Peru–Bolivia border|Highest large navigable lake|3
+MEKONG|River through Laos, Cambodia and Vietnam|Southeast Asian river ending in a delta|3
+KAZAKHSTAN|World’s largest landlocked country|Central Asian country with capital Astana|3
+ATACAMA|Extremely arid desert in Chile|South American desert|3
+BOSPHORUS|Strait dividing Istanbul|Waterway linking the Black Sea and Marmara|3
+PATAGONIA|Region at South America’s southern tip|Shared by Argentina and Chile|3
+SERENGETI|Tanzanian plain famed for wildebeest migration|East African savanna ecosystem|3
+LIECHTENSTEIN|Doubly landlocked Alpine microstate|Country between Switzerland and Austria|3
+ZAMBEZI|River with Victoria Falls|Major river of southern Africa|3
+HIMALAYAS|Range containing Everest|Mountains of Nepal and Bhutan|3`};
+const DB={};for(const k in RAW)DB[k]=RAW[k].split("\n").map((l,i)=>{const[a,c,b,d]=l.split("|");return{id:k+i,a,cl:[c,b],d:+d}});
+const CFG={1:{n:"Easy",pts:5,xp:50,w:6,pool:[1]},2:{n:"Medium",pts:10,xp:100,w:8,pool:[1,2,2,2]},3:{n:"Hard",pts:15,xp:150,w:10,pool:[2,3,3,3]}};
+const CATN={gk:"General Knowledge",geo:"Geography"},HP={letter:1,word:3};
+const $=s=>document.querySelector(s);let S={cat:"gk",diff:1},G=null;
+// storage
+const ld=()=>{try{return JSON.parse(localStorage.getItem("kw")||"{}")}catch(e){return{}}};
+const sv=o=>{try{localStorage.setItem("kw",JSON.stringify(o))}catch(e){}};
+let P=Object.assign({pts:0,xp:0,done:[0,0,0],played:0,hist:[],rew:[],cl:{},name:"",nl:"",bio:"",av:0,joined:Date.now(),days:{}},ld());
+const lvl=x=>Math.floor((1+Math.sqrt(1+x/12.5))/2),need=l=>50*l*(l-1);
+const title=l=>l<5?"Beginner":l<10?"Explorer":l<20?"Scholar":l<30?"Expert":l<50?"Master":"Grandmaster";
+// theme
+let T=(()=>{try{return localStorage.getItem("kt")||"system"}catch(e){return"system"}})();
+function theme(){const r=document.documentElement;T==="system"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",T);$("#th").textContent="Theme: "+T;try{localStorage.setItem("kt",T)}catch(e){}}
+$("#th").onclick=()=>{T={system:"light",light:"dark",dark:"system"}[T];theme()};theme();
+$("#ab").onclick=()=>modal(`<h3 style="margin-top:0">About Kroswed</h3><p>Kroswed is an independent English crossword and knowledge game created by Muhammad Ilham Ramadhan. It combines interactive crossword puzzles, general knowledge, geography, and competitive gameplay to make learning more engaging.</p><p>Instagram: <a href="https://www.instagram.com/iaamramadhan/" target="_blank" rel="noopener">@iaamramadhan</a><br>© 2026 Muhammad Ilham Ramadhan. All rights reserved.</p><button class="p" onclick="closeM()">Close</button>`);
+function modal(h){closeM();const m=document.createElement("div");m.className="mod";m.id="mod";m.innerHTML=`<div class="card">${h}</div>`;document.body.appendChild(m)}
+function closeM(){const m=$("#mod");m&&m.remove()}
+// generator
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=(h*33^s.charCodeAt(i))>>>0;return h.toString(36)};
+function build(words){const g=new Map,pl=[],k=(r,c)=>r+","+c;
+ const ok=(w,r,c,dc)=>{const dr=1-dc;let x=0;if(g.has(k(r-dr,c-dc))||g.has(k(r+dr*w.length,c+dc*w.length)))return -1;
+  for(let i=0;i<w.length;i++){const rr=r+dr*i,cc=c+dc*i,e=g.get(k(rr,cc));
+   if(e){if(e!==w[i])return -1;x++}else if(g.has(k(rr-dc,cc-dr))||g.has(k(rr+dc,cc+dr)))return -1}
+  return x};
+ const put=(e,w,r,c,dc)=>{for(let i=0;i<w.length;i++)g.set(k(r+(1-dc)*i,c+dc*i),w[i]);pl.push({e,w,r,c,dir:dc?"A":"D"})};
+ put(words[0],words[0].a,0,0,1);
+ for(const e of words.slice(1)){const w=e.a,cand=[];
+  for(const p of pl)for(let i=0;i<p.w.length;i++)for(let j=0;j<w.length;j++)if(p.w[i]===w[j]){
+   const dc=p.dir==="A"?0:1,r=p.dir==="A"?p.r-j:p.r+i,c=p.dir==="A"?p.c+i:p.c-j;
+   if(ok(w,r,c,dc)===1&&!pl.some(q=>q.e===e))cand.push([r,c,dc])}
+  if(cand.length){const[r,c,dc]=cand[Math.random()*cand.length|0];put(e,w,r,c,dc)}}
+ return pl}
+function gen(cat,diff){const cf=CFG[diff],pool=DB[cat].filter(e=>cf.pool.includes(e.d)||(diff===1&&e.d===1));
+ const hw={};P.hist.slice(-100).forEach(h=>h.a.forEach(a=>hw[a]=(hw[a]||0)+1));const seen=new Set(P.hist.map(h=>h.fp));
+ let best=null,bs=-1e9;
+ for(let t=0;t<120;t++){const ws=shuf(pool).sort((a,b)=>(hw[a.a]||0)-(hw[b.a]||0)+Math.random()*2-1).slice(0,cf.w+6);
+  const pl=build(shuf(ws));if(pl.length<Math.min(cf.w,pool.length)-1)continue;
+  const rs=Math.min(...pl.map(p=>p.r)),cs=Math.min(...pl.map(p=>p.c));pl.forEach(p=>{p.r-=rs;p.c-=cs});
+  const fp=hash(cat+diff+pl.map(p=>p.w+p.r+p.c+p.dir).sort().join());
+  const sc=pl.length*100-pl.reduce((s,p)=>s+(hw[p.w]||0),0)*8-(seen.has(fp)?1000:0)-Math.max(...pl.map(p=>p.r+p.w.length*(p.dir==="D")))*0.1;
+  if(sc>bs){bs=sc;best={pl,fp}}}
+ if(!best)return null;const pl=best.pl;
+ pl.forEach(p=>{const u=p.e.cl.map((_,i)=>P.cl[p.e.id+i]||0);p.ci=u[0]<=u[1]?0:1;p.alt=false});
+ const R=Math.max(...pl.map(p=>p.r+(p.dir==="D"?p.w.length:1))),C=Math.max(...pl.map(p=>p.c+(p.dir==="A"?p.w.length:1)));
+ const cells={};pl.forEach(p=>{for(let i=0;i<p.w.length;i++){const r=p.r+(p.dir==="D")*i,c=p.c+(p.dir==="A")*i;cells[r+","+c]=p.w[i]}});
+ let n=0;const num={};const sorted=pl.slice().sort((a,b)=>a.r-b.r||a.c-b.c);
+ sorted.forEach(p=>{const key=p.r+","+p.c;if(!num[key])num[key]=++n;p.n=num[key]});
+ return{cat,diff,pl,R,C,cells,num,fp:best.fp,u:{},rv:{},wr:{},hints:0,pen:0,t:0,sel:null,dir:"A",pause:false,done:false,repeat:seen.has(best.fp)}}
+// game
+function wordAt(r,c,dir){return G.pl.find(p=>p.dir===dir&&(dir==="A"?p.r===r&&c>=p.c&&c<p.c+p.w.length:p.c===c&&r>=p.r&&r<p.r+p.w.length))}
+const cur=()=>G.sel&&(wordAt(...G.sel,G.dir)||wordAt(...G.sel,G.dir==="A"?"D":"A"));
+function cellsOf(p){return[...Array(p.w.length)].map((_,i)=>[p.r+(p.dir==="D")*i,p.c+(p.dir==="A")*i])}
+function start(){G=gen(S.cat,S.diff);if(!G){$("#app").innerHTML='<div class="card">Not enough content to build a puzzle.</div>';return}
+ const f=G.pl.slice().sort((a,b)=>a.n-b.n)[0];G.sel=[f.r,f.c];G.dir=f.dir;P.hist.push({fp:G.fp,a:G.pl.map(p=>p.w),cat:S.cat,diff:S.diff,t:Date.now()});P.hist=P.hist.slice(-300);P.played++;sv(P);
+ clearInterval(G.iv);G.iv=setInterval(()=>{if(G&&!G.pause&&!G.done){G.t++;const e=$("#tm");e&&(e.textContent=fmt(G.t))}},1000);drawG()}
+const fmt=t=>String(t/60|0).padStart(2,"0")+":"+String(t%60).padStart(2,"0");
+function drawG(){const p=cur(),pot=Math.max(0,CFG[G.diff].pts-G.pen);let h=`<div class="row" style="justify-content:space-between;align-items:center;margin-top:14px"><b>${CATN[G.cat]} · ${CFG[G.diff].n}</b><span>⏱ <span id="tm">${fmt(G.t)}</span> · Potential +${pot} pts</span></div>${G.repeat?'<div class="tag">Content pool is limited: this layout may resemble one you played.</div>':""}<div id="game"><div class="card gw"><div class="g" style="grid-template-columns:repeat(${G.C},1fr);width:min(100%,${G.C*46}px)">`;
+ const act=new Set(p?cellsOf(p).map(x=>x+""):[]);
+ for(let r=0;r<G.R;r++)for(let c=0;c<G.C;c++){const k=r+","+c;if(!(k in G.cells)){h+='<div class="c b"></div>';continue}
+  const s=G.sel&&G.sel[0]===r&&G.sel[1]===c,v=G.u[k]||"",cls=["c",s?"s":act.has(k)?"a":"",G.pause||!v?"":G.wr[k]?(v===G.cells[k]?"":"x"):"",G.rv[k]?"r":""].join(" ");
+  h+=`<div class="${cls}" data-r="${r}" data-c="${c}">${G.num[k]?`<sup>${G.num[k]}</sup>`:""}${G.pause?"":v}</div>`}
+ h+=`</div></div><div class="card"><div id="cur">${p?p.n+" "+(p.dir==="A"?"Across":"Down")+" ("+p.w.length+"): "+p.e.cl[p.alt?1-p.ci:p.ci]:""}</div><div class="row" style="margin:8px 0"><button id="pv">◀ Prev</button><button id="nx">Next ▶</button><button id="tg">Across/Down</button></div><div class="row" style="margin-bottom:8px"><button id="h1">Reveal letter −1</button><button id="h2">Reveal word −3</button><button id="h3">Show clue (free)</button><button id="ck">Check</button><button id="cw">Clear word</button><button id="ps">${G.pause?"Resume":"Pause"}</button><button id="ex">Exit</button></div><div class="cl">`;
+ for(const d of["A","D"]){h+=`<h3>${d==="A"?"ACROSS":"DOWN"}</h3>`;G.pl.filter(x=>x.dir===d).sort((a,b)=>a.n-b.n).forEach(x=>{h+=`<div data-n="${x.n}" data-d="${d}" class="${p===x?"a":""}">${x.n}. ${x.e.cl[x.ci]}</div>`})}
+ $("#app").innerHTML=h+"</div></div></div>";bind()}
+function bind(){document.querySelectorAll(".c[data-r]").forEach(e=>e.onclick=()=>{if(G.pause)return;const r=+e.dataset.r,c=+e.dataset.c;if(G.sel&&G.sel[0]===r&&G.sel[1]===c){const o=G.dir==="A"?"D":"A";wordAt(r,c,o)&&(G.dir=o)}else{G.sel=[r,c];if(!wordAt(r,c,G.dir))G.dir=G.dir==="A"?"D":"A"}drawG();$("#hid").focus()});
+ document.querySelectorAll(".cl div").forEach(e=>e.onclick=()=>{const p=G.pl.find(x=>x.n==e.dataset.n&&x.dir===e.dataset.d);G.sel=[p.r,p.c];G.dir=p.dir;drawG();$("#hid").focus()});
+ const ord=()=>G.pl.slice().sort((a,b)=>a.dir.localeCompare(b.dir)||a.n-b.n),go=d=>{const o=ord(),i=o.indexOf(cur()),p=o[(i+d+o.length)%o.length];G.sel=[p.r,p.c];G.dir=p.dir;drawG()};
+ $("#pv").onclick=()=>go(-1);$("#nx").onclick=()=>go(1);$("#tg").onclick=()=>{const o=G.dir==="A"?"D":"A";if(wordAt(...G.sel,o)){G.dir=o;drawG()}};
+ $("#h1").onclick=()=>{const p=cur(),c=cellsOf(p).find(([r,c])=>G.u[r+","+c]!==G.cells[r+","+c]);if(!c){return}if(!confirm("Reveal one letter? Potential reward −1."))return;const k=c+"";G.u[k]=G.cells[k];G.rv[k]=1;G.hints++;G.pen+=HP.letter;after()};
+ $("#h2").onclick=()=>{const p=cur();if(!cellsOf(p).some(([r,c])=>G.u[r+","+c]!==G.cells[r+","+c]))return;if(!confirm("Reveal the whole word? Potential reward −3."))return;cellsOf(p).forEach(x=>{G.u[x+""]=G.cells[x+""];G.rv[x+""]=1});G.hints++;G.pen+=HP.word;after()};
+ $("#h3").onclick=()=>{const p=cur();p.alt=!p.alt;drawG()};
+ $("#ck").onclick=()=>{G.wr={};for(const k in G.u)G.wr[k]=1;drawG();setTimeout(()=>{G&&(G.wr={},drawG())},2000)};
+ $("#cw").onclick=()=>{cellsOf(cur()).forEach(x=>{if(!G.rv[x+""])delete G.u[x+""]});drawG()};
+ $("#ps").onclick=()=>{G.pause=!G.pause;drawG()};$("#ex").onclick=()=>{if(confirm("Leave this unfinished puzzle?")){clearInterval(G.iv);G=null;home()}}}
+function after(){drawG();if(Object.keys(G.cells).every(k=>G.u[k]===G.cells[k]))finish();else $("#hid").focus()}
+function move(d){const p=cur();if(!p)return;const cs=cellsOf(p),i=cs.findIndex(x=>x+""===G.sel+"");const n=cs[i+d];if(n){G.sel=n;G.dir=p.dir}}
+function typeL(ch){if(!G||G.pause||G.done||!G.sel)return;const k=G.sel+"";if(G.rv[k]){move(1);drawG();return}G.u[k]=ch;move(1);after()}
+const hid=$("#hid");hid.addEventListener("keydown",e=>{if(!G)return;const K=e.key;
+ if(/^[a-zA-Z]$/.test(K)&&!e.ctrlKey&&!e.metaKey){e.preventDefault();typeL(K.toUpperCase())}
+ else if(K==="Backspace"){e.preventDefault();const k=G.sel+"";if(G.u[k]&&!G.rv[k])delete G.u[k];else{move(-1);const q=G.sel+"";if(!G.rv[q])delete G.u[q]}drawG()}
+ else if(K.startsWith("Arrow")){e.preventDefault();const[r,c]=G.sel,[dr,dc]={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[K];if(G.cells[(r+dr)+","+(c+dc)]){G.sel=[r+dr,c+dc];if(!wordAt(...G.sel,G.dir))G.dir=G.dir==="A"?"D":"A";drawG()}}
+ else if(K==="Tab"||K===" "){e.preventDefault();const o=G.dir==="A"?"D":"A";if(wordAt(...G.sel,o)){G.dir=o;drawG()}}});
+hid.addEventListener("input",()=>{const v=hid.value.slice(-1);hid.value="";if(/[a-zA-Z]/.test(v))typeL(v.toUpperCase())});
+async function finish(){G.done=true;clearInterval(G.iv);const cf=CFG[G.diff],oldL=lvl(P.xp);
+ G.pl.forEach(p=>{P.cl[p.e.id+p.ci]=(P.cl[p.e.id+p.ci]||0)+1});modal("<p>Saving result…</p>");
+ let r={awarded:false,base:cf.pts,penalty:0,points:0,xp:0,error:""};
+ try{const{data,error}=await sb.rpc("submit_completion",{p_fp:G.fp,p_diff:G.diff,p_hints:G.hints,p_pen:G.pen,p_secs:G.t,p_words:G.pl.map(p=>({id:p.e.id,ans:p.w}))});if(error)throw error;r=data}catch(e){r.error=e.message}
+ await loadProfile();const L=lvl(P.xp);
+ modal(`<h3 style="margin-top:0">Puzzle completed!</h3><p>${CATN[G.cat]} · ${cf.n}<br>Time: ${fmt(G.t)}<br>Correct entries: ${G.pl.length}/${G.pl.length}<br>Hints used: ${G.hints}<br>Base points: +${r.base}<br>Hint penalty: −${r.penalty}<br><b>Total points: +${r.points}</b><br>XP earned: ${r.xp} XP<br>Level ${L} — ${title(L)}${L>oldL?" 🎉 Level up!":""}</p>${r.error?`<p class="tag" style="color:var(--err)">Server: ${esc(r.error)}</p>`:r.awarded?"":'<p class="tag">This puzzle was already rewarded, so no extra points.</p>'}<div class="row"><button class="p" id="again">Play another</button><button id="hm">Home</button><button id="lbb">Leaderboard</button></div>`);
+ $("#again").onclick=()=>{closeM();start()};$("#hm").onclick=()=>{closeM();G=null;home()};$("#lbb").onclick=()=>{closeM();G=null;lbView()}}
+function home(){const L=lvl(P.xp),lo=need(L),hi=need(L+1),pc=Math.round((P.xp-lo)/(hi-lo)*100);
+ $("#app").innerHTML=`<div class="card"><div class="row" style="justify-content:space-between"><b>${esc(P.name||"Player")} · Level ${L} · ${title(L)}</b><span>${P.pts} pts · ${P.xp} XP</span></div><div class="bar" style="margin:8px 0"><i style="width:${pc}%"></i></div><div class="tag">${hi-P.xp} XP to level ${L+1} · Played ${P.played} · Completed: Easy ${P.done[0]}, Medium ${P.done[1]}, Hard ${P.done[2]}</div></div>
+ <div class="card"><b>Category</b><div class="row" style="margin:8px 0">${Object.keys(CATN).map(k=>`<button class="opt ${S.cat===k?"on":""}" data-cat="${k}">${CATN[k]}<small>${DB[k].length} verified entries</small></button>`).join("")}</div>
+ <b>Difficulty</b><div class="row" style="margin:8px 0">${[1,2,3].map(d=>`<button class="opt ${S.diff===d?"on":""}" data-d="${d}">${CFG[d].n}<small>+${CFG[d].pts} points · ${CFG[d].xp} XP</small></button>`).join("")}</div><button class="p" id="go">Start Game</button></div><div class="card" id="lp"></div>`;
+ document.querySelectorAll("[data-cat]").forEach(e=>e.onclick=()=>{S.cat=e.dataset.cat;home()});document.querySelectorAll("[data-d]").forEach(e=>e.onclick=()=>{S.diff=+e.dataset.d;home()});$("#go").onclick=start;lbPrev()}
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const AV=["#4778B8","#32936F","#D39A42","#D45D5D","#7C6BB5","#2F8FA3"];
+const av=(n,i,z=32)=>`<span style="display:inline-flex;width:${z}px;height:${z}px;border-radius:50%;background:${AV[i||0]};color:#fff;align-items:center;justify-content:center;font-weight:600;flex:none">${esc((n||"?")[0].toUpperCase())}</span>`;
+const CF=window.KW_CONFIG||{};let sb=null,UID=null,LT="all",recov=false;
+const setNav=on=>document.querySelectorAll("[data-v]").forEach(b=>b.style.display=on?"":"none");
+async function loadProfile(){const{data:u}=await sb.auth.getUser();if(!u||!u.user)return false;UID=u.user.id;const{data}=await sb.from("profiles").select("*").eq("id",UID).single();if(!data)return false;
+ Object.assign(P,{name:data.username,bio:data.bio||"",av:data.av||0,joined:Date.parse(data.joined),pts:data.pts,xp:data.xp,done:[data.done_easy,data.done_medium,data.done_hard]});sv(P);return true}
+async function enter(){recov=false;if(await loadProfile()){setNav(true);home()}else authView()}
+function authView(m="login"){setNav(false);const reg=m==="register",inp=(id,t,ph)=>`<input id="${id}" type="${t}" placeholder="${ph}" style="width:100%;margin-bottom:8px">`;
+ $("#app").innerHTML=`<div class="card" style="max-width:420px;margin:20px auto"><h3 style="margin-top:0">${{login:"Sign in",register:"Create account",forgot:"Reset password",recover:"Set a new password"}[m]}</h3>${reg?inp("f_u","text","Username"):""}${m!=="recover"?inp("f_e","email","Email"):""}${m!=="forgot"?inp("f_p","password","Password"):""}${reg||m==="recover"?inp("f_c","password","Confirm password"):""}<div class="tag" id="f_m" style="min-height:22px"></div><button class="p" id="f_go">Continue</button><div class="row" style="margin-top:10px">${m==="login"?'<button data-m="register">Register</button><button data-m="forgot">Forgot password</button>':'<button data-m="login">Back to sign in</button>'}</div></div>`;
+ document.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>authView(b.dataset.m));
+ const msg=t=>{$("#f_m").textContent=t},v=i=>($(i)||{}).value||"";
+ $("#f_go").onclick=async()=>{msg("");const e=v("#f_e").trim(),p=v("#f_p"),u=v("#f_u").trim();
+  try{if(m==="login"){const{error}=await sb.auth.signInWithPassword({email:e,password:p});if(error)throw error}
+  else if(m==="register"){if(!/^[A-Za-z0-9_]{3,20}$/.test(u))return msg("Username: 3–20 letters, numbers or underscores.");if(p.length<8)return msg("Password must be at least 8 characters.");if(p!==v("#f_c"))return msg("Passwords do not match.");
+   const{data:free,error:ue}=await sb.rpc("username_available",{p_name:u});if(ue)throw ue;if(free!==true)return msg("That username is taken.");
+   const{data,error}=await sb.auth.signUp({email:e,password:p,options:{data:{username:u}}});if(error)throw error;if(!data.session)msg("Check your email to confirm your account, then sign in.")}
+  else if(m==="forgot"){const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin});if(error)throw error;msg("If that email exists, a reset link was sent.")}
+  else{if(p.length<8)return msg("Password must be at least 8 characters.");if(p!==v("#f_c"))return msg("Passwords do not match.");const{error}=await sb.auth.updateUser({password:p});if(error)throw error;await enter()}}
+  catch(x){msg(/fetch/i.test(x.message)?"Cannot reach Supabase. Check the URL and key in config.js, and that your project is not paused.":x.message)}}}
+async function lbData(t){const{data,error}=await sb.rpc("leaderboard",{p_period:t});if(error)throw error;return data||[]}
+async function lbPrev(){const e=$("#lp");if(!e)return;try{const r=(await lbData("all")).slice(0,5);e.innerHTML="<b>Top players (All Time)</b>"+(r.map(x=>`<div class="row" style="align-items:center;margin-top:6px"><b>#${x.pos}</b>${av(x.username,x.av,24)}<span style="flex:1">${esc(x.username)}</span><b>${x.pts}</b></div>`).join("")||"<div class='tag'>No scores yet.</div>")}catch(x){}}
+async function lbView(){$("#app").innerHTML=`<div class="card"><div class="row">${[["day","Today"],["wk","Weekly"],["all","All Time"]].map(([k,l])=>`<button data-t="${k}" class="${LT===k?"on":""}">${l}</button>`).join("")}</div><div class="tag" style="margin-top:6px">Today resets at 00:00 WIB; Weekly resets every Monday 00:00 WIB (Asia/Jakarta).</div><div id="lbl" style="margin-top:10px">Loading…</div></div>`;
+ document.querySelectorAll("[data-t]").forEach(e=>e.onclick=()=>{LT=e.dataset.t;lbView()});
+ let rows;try{rows=await lbData(LT==="wk"?"week":LT)}catch(e){$("#lbl").textContent="Could not load the leaderboard.";return}
+ const cc=["var(--gold)","#A7B1BE","#B07A4A"];
+ const row=r=>{const i=r.pos-1,l=lvl(r.xp);return`<div class="row" style="align-items:center;padding:8px;border-radius:8px;margin-bottom:4px;${r.user_id===UID?"background:var(--act);":""}${i<3?"border-left:4px solid "+cc[i]+";":""}"><b style="width:40px;${i<3?"color:"+cc[i]:""}">#${r.pos}</b>${av(r.username,r.av)}<div style="flex:1;min-width:100px"><b>${esc(r.username)}</b><div class="tag">Lv ${l} · ${title(l)}</div></div><b>${r.pts} pts</b></div>`};
+ const top=rows.filter(r=>r.pos<=100),me=rows.find(r=>r.user_id===UID&&r.pos>100);
+ $("#lbl").innerHTML=(top.map(row).join("")||"<p>No scores yet for this period.</p>")+(me?'<div class="tag">Your position</div>'+row(me):"")}
+function pfView(){const l=lvl(P.xp),d=P.done,tot=d[0]+d[1]+d[2];
+ const ach=[["First puzzle",tot>=1],["10 puzzles",tot>=10],["Hard solver",d[2]>=1],["100 points",P.pts>=100],["Scholar (Lv 10)",l>=10]];
+ $("#app").innerHTML=`<div class="card"><div class="row" style="align-items:center">${av(P.name,P.av,56)}<div><b style="font-size:18px">${esc(P.name)}</b><div class="tag">Level ${l} · ${title(l)} · Joined ${new Date(P.joined).toLocaleDateString()}</div></div></div><p>${esc(P.bio||"No description yet.")}</p><div class="row">${[["Points",P.pts],["XP",P.xp],["Completed",tot],["Easy",d[0]],["Medium",d[1]],["Hard",d[2]]].map(([a,b])=>`<div class="card" style="margin:0;padding:8px 12px"><div class="tag">${a}</div><b>${b}</b></div>`).join("")}</div></div>
+<div class="card"><b>Achievements</b><div class="row" style="margin-top:8px">${ach.map(([n,o])=>`<span style="padding:4px 10px;border-radius:99px;border:1px solid var(--bd);${o?"background:var(--ok);color:#fff":"color:var(--mut)"}">${n}</span>`).join("")}</div></div>
+<div class="card"><b>Edit profile</b><div class="row" style="margin:8px 0">${AV.map((c,i)=>`<button data-a="${i}" aria-label="Avatar color ${i+1}" style="background:${c};width:32px;height:32px;padding:0;border-radius:50%;${P.av===i?"outline:3px solid var(--fg)":""}"></button>`).join("")}</div><div class="row"><input id="un" maxlength="20" value="${esc(P.name)}" placeholder="Username" style="flex:1"><button class="p" id="sn">Save username</button></div><textarea id="bi" maxlength="140" rows="2" placeholder="Short description" style="width:100%;margin:8px 0">${esc(P.bio)}</textarea><button id="sb">Save description</button> <span id="msg" class="tag"></span></div>
+<div class="card"><button id="lo">Log out</button></div>`;
+ const upd=async f=>{const{error}=await sb.from("profiles").update(f).eq("id",UID);return error};
+ document.querySelectorAll("[data-a]").forEach(b=>b.onclick=async()=>{await upd({av:+b.dataset.a});await loadProfile();pfView()});
+ $("#sn").onclick=async()=>{const e=await upd({username:$("#un").value.trim()});if(e){$("#msg").textContent=e.code==="23505"?"That username is taken.":e.code==="23514"?"Use 3–20 letters, numbers or underscores.":e.message;return}await loadProfile();pfView()};
+ $("#sb").onclick=async()=>{const e=await upd({bio:$("#bi").value.slice(0,140)});$("#msg").textContent=e?e.message:"Saved.";if(!e)await loadProfile()};
+ $("#lo").onclick=()=>sb.auth.signOut()}
+document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{if(G&&!G.done&&!confirm("Leave this unfinished puzzle?"))return;if(G){clearInterval(G.iv);G=null}({home:home,lb:lbView,pf:pfView})[b.dataset.v]()});
+(async()=>{setNav(false);const U=String(CF.url||"").trim().replace(/\/+$/,""),K=String(CF.key||"").trim();
+ let why="";if(!window.KW_CONFIG)why="config.js was not loaded (missing file or blocked). Open /config.js on this site to check.";
+ else if(!U||!K||/YOUR-/i.test(U+K))why="config.js still contains the placeholder values.";
+ else if(!/^https:\/\/[^\/\s"']+$/i.test(U))why="url is not a valid https address (got: "+esc(U.slice(0,60))+"). Use only the Project URL, e.g. https://abcdxyz.supabase.co.";
+ else if(/\/(rest|auth)\/v1/i.test(U))why="url must not include /rest/v1 or /auth/v1.";
+ else if(K.length<20)why="key looks too short. Use the anon public key from Project Settings > API.";
+ if(why||!window.supabase){$("#app").innerHTML='<div class="card"><b>Setup required.</b><p>'+(why||"The Supabase library failed to load (network or ad blocker).")+'</p></div>';return}
+ CF.url=U;CF.key=K;
+ sb=supabase.createClient(CF.url,CF.key);
+ sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY"){recov=true;authView("recover")}else if(ev==="SIGNED_IN"&&!UID&&!recov)setTimeout(enter,0);else if(ev==="SIGNED_OUT"){UID=null;G=null;authView()}});
+ const{data}=await sb.auth.getSession();if(data.session&&!recov)await enter();else if(!recov)authView()})();
+</script></body></html>
